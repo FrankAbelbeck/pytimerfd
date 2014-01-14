@@ -1,0 +1,66 @@
+--------------------------------------------------------------------------------
+pytimerfd: Python bindings for the Linux timerfd_* syscalls
+--------------------------------------------------------------------------------
+
+Author: Copyright (C) 2013 Frank Abelbeck <frank.abelbeck@googlemail.com>
+
+Version: 1.2
+
+Licence: LGPL
+
+Platform: Linux
+
+--------------------------------------------------------------------------------
+
+Description: "These system calls create and operate on a timer that delivers
+timer expiration notifications via a file descriptor. They provide an
+alternative to the use of setitimer() or timer_create(), with the advantage that
+the file descriptor may be monitored by select(), poll(), and epoll()."
+                                             [source: manpage of timerfg_create]
+
+--------------------------------------------------------------------------------
+
+Installation: An ebuild for Gentoo Linux will be available soon. On any other
+Linux system this package might be installed using the usual distutils way:
+
+    python setup.py install
+
+--------------------------------------------------------------------------------
+
+Usage: After installation a new python module named "timerfd" is available.
+
+To create and arm a timer file object the following steps are neccessary:
+
+    >>> import timerfd,os
+    >>> f = timerfd.create(timerfd.CLOCK_REALTIME,0)
+    >>> timerfd.settime(f,0,10,0)
+    (0.0, 0.0)
+    >>> os.read(f,1024)
+(blocks until f becomes readable, i.e. timer expires)
+    b'\x01\x00\x00\x00\x00\x00\x00\x00'
+
+Reading the timer file object returns the number of timer expirations.
+
+Periodic timers can be set, too. In this example we set up a timer that expires
+one second and then every two seconds, wait 10 seconds and read the file object:
+
+    >>> import time
+    >>> timerfd.settime(f,0,1,2); time.sleep(10); os.read(f,1024)
+    (0.0, 0.0)
+    b'\x05\x00\x00\x00\x00\x00\x00\x00'
+
+During the 10 seconds sleep the timer has expired 5 times (1+2+2+2+2=9).
+
+It is possible to retrieve the timer's remaining time and its period:
+
+    >>> timerfd.gettime(f)
+    (1.8879305124282837, 2.0)
+	
+--------------------------------------------------------------------------------
+
+Changelog:
+
+   1.1     2013-09-01     added support for Python v2 (compiler directives)
+   
+   1.2     2013-09-17     moved COPYING from datafiles into MANIFEST.in to fix
+                          installation behaviour; modified README
