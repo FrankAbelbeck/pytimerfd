@@ -16,7 +16,7 @@ Description: "These system calls create and operate on a timer that delivers
 timer expiration notifications via a file descriptor. They provide an
 alternative to the use of setitimer() or timer_create(), with the advantage that
 the file descriptor may be monitored by select(), poll(), and epoll()."
-                                             [source: manpage of timerfg_create]
+                                             [source: manpage of timerfd_create]
 
 --------------------------------------------------------------------------------
 
